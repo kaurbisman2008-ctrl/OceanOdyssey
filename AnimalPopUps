@@ -1,0 +1,73 @@
+
+local ACTIVATION_DISTANCE = 80
+local ROOT_NAMES = { "CoralReefs", "Pollution", "foursharks"}
+
+local function ensurePromptOnModel(model: Model)
+local ok, cf, size = pcall(model.GetBoundingBox, model)
+if not ok then return end
+
+local hitbox = model:FindFirstChild("InteractZone")
+if not hitbox then
+hitbox = Instance.new("Part")
+hitbox.Name = "InteractZone"
+hitbox.Anchored = true
+hitbox.CanCollide = false
+hitbox.CanQuery   = true
+hitbox.CanTouch   = false
+hitbox.Transparency = 1
+hitbox.Parent = model
+end
+
+hitbox.Size = size + Vector3.new(10, 10, 10)
+hitbox.CFrame = cf
+
+if model:GetAttribute("InfoKey") == nil then
+model:SetAttribute("InfoKey", model.Name)
+end
+local infoKey = model:GetAttribute("InfoKey") or model.Name
+
+local prompt = hitbox:FindFirstChildOfClass("ProximityPrompt")
+if not prompt then
+prompt = Instance.new("ProximityPrompt")
+prompt.Name = "POIPrompt"
+prompt.Parent = hitbox
+end
+
+prompt.ActionText = "Inspect"
+prompt.ObjectText = infoKey
+prompt.HoldDuration = 0
+prompt.RequiresLineOfSight = false
+prompt.MaxActivationDistance = ACTIVATION_DISTANCE
+
+local function instrumentFolder(rootName: string)
+local root = workspace:FindFirstChild(rootName)
+if not root then
+warn(("[CoralSetup] Folder '%s' not found."):format(rootName))
+return
+end
+
+for _, child in ipairs(root:GetChildren()) do
+if child:IsA("Model") then
+ensurePromptOnModel(child)
+end
+end
+
+for _, obj in ipairs(root:GetDescendants()) do
+if obj:IsA("Model") then
+ensurePromptOnModel(obj)
+end
+end
+
+root.DescendantAdded:Connect(function(obj)
+task.wait(0.1) -- allow bounding boxes to settle
+if obj:IsA("Model") then
+ensurePromptOnModel(obj)
+end
+end)
+end
+
+for _, name in ipairs(ROOT_NAMES) do
+instrumentFolder(name)
+end
+
+print("[CoralSetup] Interact zones + prompts ready for CoralReefs & Pollution.")
