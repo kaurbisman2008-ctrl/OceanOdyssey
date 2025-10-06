@@ -1,0 +1,161 @@
+local RS          = game:GetService("ReplicatedStorage")
+local PPS         = game:GetService("ProximityPromptService")
+local RunService  = game:GetService("RunService")
+
+local data = require(RS:WaitForChild("CoralData"))
+
+local gui   = script.Parent
+local frame = gui:WaitForChild("Frame")
+local title = frame:WaitForChild("Title")
+local body  = frame:WaitForChild("Body")
+local close = frame:FindFirstChild("CloseButton") or frame:FindFirstChild("TextButton")
+
+gui.Enabled   = true
+frame.Visible = not RunService:IsRunning()
+
+
+local function setupUi()
+frame.Active = true
+frame.ClipsDescendants = false
+frame.AutomaticSize = Enum.AutomaticSize.Y
+frame.Size = UDim2.new(0, 520, 0, 0)                
+frame.AnchorPoint = Vector2.new(0.5, 0)
+frame.Position = UDim2.fromScale(0.5, 0.18)
+frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
+frame.BackgroundTransparency = 0.1
+frame.BorderSizePixel = 0
+frame.ZIndex = 1
+
+local pad = frame:FindFirstChildOfClass("UIPadding")
+if not pad then
+pad = Instance.new("UIPadding")
+pad.Parent = frame
+end
+pad.PaddingTop    = UDim.new(0, 16)
+pad.PaddingBottom = UDim.new(0, 16)
+pad.PaddingLeft   = UDim.new(0, 16)
+pad.PaddingRight  = UDim.new(0, 16)
+
+local layout = frame:FindFirstChildOfClass("UIListLayout")
+if not layout then
+layout = Instance.new("UIListLayout")
+layout.Parent = frame
+end
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 8)
+
+title.LayoutOrder = 1
+title.BackgroundTransparency = 1
+title.AutomaticSize = Enum.AutomaticSize.Y
+title.Size = UDim2.new(1, 0, 0, 0)
+title.TextWrapped = true
+title.TextScaled = false
+title.TextSize = 36
+title.TextColor3 = Color3.fromRGB(40, 20, 20)
+title.ZIndex = frame.ZIndex + 1
+
+body.LayoutOrder = 2
+body.Visible = true
+body.BackgroundTransparency = 1
+body.AutomaticSize = Enum.AutomaticSize.Y
+body.Size = UDim2.new(1, 0, 0, 0)
+body.TextWrapped = true
+body.TextScaled = false
+body.TextSize = 22
+body.TextColor3 = Color3.fromRGB(40, 20, 20)
+body.TextTransparency = 0
+body.RichText = false
+body.TextYAlignment = Enum.TextYAlignment.Top
+body.ZIndex = frame.ZIndex + 1
+end
+
+setupUi()
+
+
+local function findOrCreateHighlight(model: Instance)
+local existing = model:FindFirstChild("POIHighlightLocal")
+or model:FindFirstChildOfClass("Highlight")
+if existing then return existing end
+
+local m = model :: any
+local adornee = (m.PrimaryPart)
+or (m:FindFirstChildWhichIsA("BasePart"))
+or model
+
+local hl = Instance.new("Highlight")
+hl.Name = "POIHighlightLocal"
+hl.Adornee = adornee
+hl.FillColor = Color3.fromRGB(255, 105, 180)  
+hl.OutlineColor = Color3.fromRGB(255, 105, 180)
+hl.FillTransparency = 1
+hl.OutlineTransparency = 1
+hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+hl.Parent = model
+return hl
+end
+
+
+
+local function norm(s)
+s = tostring(s or "")
+return s:lower():gsub("[%s%p_]+","")
+end
+
+local KEYMAP = {}
+for k in pairs(data) do
+if k ~= "Default" then
+KEYMAP[norm(k)] = k
+end
+end
+
+
+local function populateFrom(key, fallbackName)
+local realKey = KEYMAP[norm(key)]
+local entry = (realKey and data[realKey]) or data.Default or {}
+
+title.Text = entry.title or fallbackName or key
+body.Text  = entry.text  or "No info."
+frame.Visible = true
+end
+
+PPS.PromptShown:Connect(function(prompt)
+if not prompt then return end
+if prompt.Name ~= "POIPrompt" and prompt.Name ~= "CoralPrompt" then return end
+
+local model = prompt:FindFirstAncestorOfClass("Model")
+if not model then return end
+
+-- UNCOMMENT TO TURN ON GLOW
+--local hl = findOrCreateHighlight(model)
+--hl.FillTransparency = 0.65
+--hl.OutlineTransparency = 0
+
+local key = model:GetAttribute("InfoKey") or model.Name
+populateFrom(key, model.Name)
+end)
+
+PPS.PromptHidden:Connect(function(prompt)
+if not prompt then return end
+if prompt.Name ~= "POIPrompt" and prompt.Name ~= "CoralPrompt" then return end
+
+local model = prompt:FindFirstAncestorOfClass("Model")
+if not model then return end
+
+-- Glow OFF
+--local hl = findOrCreateHighlight(model)
+--hl.FillTransparency = 1
+--hl.OutlineTransparency = 1
+
+frame.Visible = false
+end)
+
+if close then
+close.MouseButton1Click:Connect(function()
+frame.Visible = false
+end)
+end
+
+print("✅ CoralInfoClient ready (layout-hardened; body text forced visible).")
+
