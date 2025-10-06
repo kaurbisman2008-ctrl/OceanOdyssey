@@ -1,0 +1,22 @@
+return {
+["Dead Coral"] = {
+title = "Dead Coral",
+text  = "When scuba divers touch coral, the corals are damaged. They start to lose their color and their tissues. As a result, other animals are unable to inhabit these corals, affecting them as well. Areas such as the northern Great Barrier Reef have seen almost a 97% reduction in coral reefs, impacting marine life that depend on them."
+},
+
+["Plastic Bottles"] = {
+title = "Plastic Bottles",
+text  = "Plastic bottles are dangerous to marine life as animals can get tangled in them or ingest them, mistaking them for food. Over time they break down into microplastics, which can be consumed by many species. Choose reusables and dispose of plastics properly to keep marine life safe."
+},
+
+["foursharks"] = {
+title = "Sharks",
+text  = "Scuba Divers Harm see life if they get to close to them."
+},
+
+["CoralReef"] = {
+title = "Coral Reef",
+text  = "Coral Reefs house several species of animals and provide a safe home from predators. When scuba divers touch coral, the corals become damaged and hence affected the several animals living within it."
+},
+}
+
