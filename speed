@@ -1,0 +1,18 @@
+local speed = 100
+
+
+function respawn(character) 
+	humanoid = character:FindFirstChild("Humanoid") 
+	if humanoid ~= nil then 
+		humanoid.WalkSpeed = speed 
+
+	end 
+
+end 
+
+function onPlayerEntered(newPlayer) 
+	newPlayer.CharacterAdded:connect(respawn) 
+end 
+
+game.Players.PlayerAdded:connect(onPlayerEntered) 
+
