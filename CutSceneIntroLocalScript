@@ -4,7 +4,6 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- UI references (assumes this script is a child of cutsceneUI ScreenGui)
 local cutsceneUI = script.Parent
 local blackFrame = cutsceneUI:FindFirstChild("blackFrame")
 local titlebutton = cutsceneUI:FindFirstChild("TextButton")
@@ -20,12 +19,11 @@ blackFrame.Visible = true
 titlebutton.Visible = false
 playbutton.Visible = false
 
--- Unlock mouse and set camera to Custom for cutscene
 UIS.MouseBehavior = Enum.MouseBehavior.Default
 UIS.MouseIconEnabled = true
 camera.CameraType = Enum.CameraType.Custom
 
--- Tween black frame out for cutscene effect
+
 local tweenInfo = TweenInfo.new(2.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 task.wait(3)
 local tween = TweenService:Create(blackFrame, tweenInfo, {BackgroundTransparency = 1})
@@ -33,15 +31,15 @@ tween:Play()
 tween.Completed:Wait()
 blackFrame.Visible = false
 
--- Show title and play button
+
 titlebutton.Visible = true
 playbutton.Visible = true
 
--- Play button click handler
+
 playbutton.MouseButton1Click:Connect(function()
     titlebutton.Visible = false
     playbutton.Visible = false
-    -- Switch to first-person and lock mouse
+
     camera.CameraType = Enum.CameraType.FirstPerson
     UIS.MouseBehavior = Enum.MouseBehavior.LockCenter
     UIS.MouseIconEnabled = false
