@@ -1,0 +1,25 @@
+-- Enable VR mode if a headset is detected
+local VRService = game:GetService("VRService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Check if VR is enabled
+if VRService.VREnabled then
+	print("VR headset detected! Enabling VR mode.")
+
+	-- Lock camera to VR
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.CFrame = CFrame.new(Vector3.new(0,5,0)) -- Adjust player height
+
+	-- Example: Move camera with head movement
+	VRService.UserCFrameChanged:Connect(function(userCFrame, position, rotation)
+		if userCFrame == Enum.UserCFrame.Head then
+			camera.CFrame = CFrame.new(position) * CFrame.fromEulerAnglesXYZ(rotation.X, rotation.Y, rotation.Z)
+		end
+	end)
+else
+	print("No VR headset found.")
+end
