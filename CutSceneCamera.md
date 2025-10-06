@@ -7,13 +7,11 @@ local StarterPlayer = game:GetService("StarterPlayer")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- Get UI elements from the cutsceneUI ScreenGui
 local cutsceneUI = script.Parent
 local playbutton = cutsceneUI:FindFirstChild("TextButton")
 local titlebutton = cutsceneUI:FindFirstChild("TextButton2")
 local blackFrame = cutsceneUI:FindFirstChild("blackFrame")
 
--- Initial cutscene setup
 if blackFrame then
     blackFrame.BackgroundColor3 = Color3.new(0,0,0)
     blackFrame.Size = UDim2.new(1,0,1,0)
@@ -30,7 +28,6 @@ UserInputService.MouseIconEnabled = true
 camera.CameraType = Enum.CameraType.Custom
 StarterPlayer.CameraMode = Enum.CameraMode.Classic
 
--- Fade out black frame
 local tweenInfo = TweenInfo.new(
     2.5,
     Enum.EasingStyle.Quad,
@@ -49,7 +46,6 @@ end
 if titlebutton then titlebutton.Visible = true end
 if playbutton then playbutton.Visible = true end
 
--- Play button switches to LockFirstPerson
 if playbutton then
     playbutton.MouseButton1Click:Connect(function()
         if titlebutton then titlebutton.Visible = false end
@@ -61,10 +57,3 @@ if playbutton then
         UserInputService.MouseIconEnabled = false
     end)
 end
-
--- Optionally, handle titlebutton click if needed
--- if titlebutton then
---     titlebutton.MouseButton1Click:Connect(function()
---         -- Add logic here if needed
---     end)
--- end
